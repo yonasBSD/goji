@@ -57,7 +57,7 @@ var checkCmd = &cobra.Command{
 		parts := strings.SplitN(commitMessage, ":", 2)
 		if len(parts) != 2 {
 			fmt.Println("Error: Commit message does not follow the conventional commit format.")
-			return
+			os.Exit(1)
 		}
 		var typeNames []string
 		for _, t := range config.Types {
@@ -68,14 +68,14 @@ var checkCmd = &cobra.Command{
 		typeScope := strings.Split(strings.TrimSpace(parts[0]), "(")
 		if len(typeScope) > 2 {
 			fmt.Println("Error: Commit message does not follow the conventional commit format.")
-			return
+			os.Exit(1)
 		}
 
 		// Validate the type
 		typeRegex := regexp.MustCompile(`\A[\w\s]*?(` + typePattern + `)\z`)
 		if !typeRegex.MatchString(typeScope[0]) {
 			fmt.Println("Error: Commit message type is invalid.")
-			return
+			os.Exit(1)
 		}
 
 		// Validate the scope (optional)
@@ -83,13 +83,13 @@ var checkCmd = &cobra.Command{
 			scope := strings.TrimSuffix(typeScope[1], ")")
 			if scope == "" {
 				fmt.Println("Error: Commit message scope is empty.")
-				return
+				os.Exit(1)
 			}
 		}
 		description := strings.TrimSpace(parts[1])
 		if description == "" {
 			fmt.Println("Error: Commit message description is empty.")
-			return
+			os.Exit(1)
 		}
 		fmt.Printf("Success: Your commit message follows the conventional commit format: \n%s", commitMessage)
 	},
