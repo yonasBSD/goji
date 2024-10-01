@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	gitFlags                                      []string
-	version, typeFlag, messageFlag, scopeFlag     string
-	versionFlag, noVerifyFlag, amendFlag, addFlag bool
+	gitFlags                                                    []string
+	version, typeFlag, messageFlag, scopeFlag                   string
+	versionFlag, noCommitFlag, noVerifyFlag, amendFlag, addFlag bool
 )
 
 var rootCmd = &cobra.Command{
@@ -53,7 +53,12 @@ var rootCmd = &cobra.Command{
 			return fmt.Errorf("commit message cannot be empty")
 		}
 
-		return executeGitCommit(commitMessage, commitBody, cfg.SignOff)
+		if !noCommitFlag {
+			return executeGitCommit(commitMessage, commitBody, cfg.SignOff)
+		}
+
+		color.Green("%s\n%s", commitMessage, commitBody)
+		return nil
 	},
 }
 
@@ -73,6 +78,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&typeFlag, "type", "t", "", "Specify the type from the config file")
 	rootCmd.Flags().StringVarP(&scopeFlag, "scope", "s", "", "Specify a custom scope")
 	rootCmd.Flags().StringVarP(&messageFlag, "message", "m", "", "Specify a commit message")
+	rootCmd.Flags().BoolVarP(&noCommitFlag, "no-commit", "c", false, "bypass commit")
 	rootCmd.Flags().BoolVarP(&noVerifyFlag, "no-verify", "n", false, "bypass pre-commit and commit-msg hooks")
 	rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "Display version information")
 	rootCmd.Flags().BoolVarP(&addFlag, "add", "a", false, "Automatically stage files that have been modified and deleted")
